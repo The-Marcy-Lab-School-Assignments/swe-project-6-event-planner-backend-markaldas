@@ -7,6 +7,12 @@ port: process.env.PGPORT,
 database: process.env.PGDATABASE
 };
 
-const pool = new Pool(config);
+const prodConfig = {
+    connectionString: process.env.PG_CONNECTION_STRING,
+};
+
+const pool = new Pool(process.env.PG_CONNECTION_STRING ? prodConfig : config);
+
+
 
 module.exports = pool;
