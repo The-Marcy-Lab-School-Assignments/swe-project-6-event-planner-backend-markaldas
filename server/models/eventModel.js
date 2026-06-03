@@ -1,7 +1,7 @@
 const pool = require('../db/pool');
 
 module.exports.list = async () => {
-    const query = 'SELECT events.event_id, events.title, events.description, events.date, events.location, events.event_type, events.max_capacity, events.user_id, users.username, COUNT(rsvps.user_id) AS rsvps_count FROM users INNER JOIN events ON users.user_id = events.user_id INNER JOIN rsvps ON events.event_id = rsvps.event_id GROUP BY events.event_id, users.username ORDER BY events.date ASC;'
+    const query = 'SELECT events.event_id, events.title, events.description, events.date, events.location, events.event_type, events.max_capacity, events.user_id, users.username, COUNT(rsvps.user_id) AS rsvps_count FROM users INNER JOIN events ON users.user_id = events.user_id LEFT JOIN rsvps ON events.event_id = rsvps.event_id GROUP BY events.event_id, users.username ORDER BY events.date ASC;'
     const { rows } = await pool.query(query);
     return rows;
 };
@@ -37,7 +37,7 @@ module.exports.destroy = async (event_id) => {
 }
 
 module.exports.listByUser = async (user_id) => {
-    const query = `SELECT events.*, COUNT(rsvps.user_id) AS rsvps_count FROM events INNER JOIN rsvps ON events.event_id = rsvps.event_id GROUP BY events.event_id HAVING events.user_id = $1 ORDER BY events.date ASC;`
+    const query = `SELECT events.*, COUNT(rsvps.user_id) AS rsvps_count FROM events LEFT JOIN rsvps ON events.event_id = rsvps.event_id GROUP BY events.event_id HAVING events.user_id = $1 ORDER BY events.date ASC;`
     const { rows } = await pool.query(query, [user_id]);
     return rows;
 };
